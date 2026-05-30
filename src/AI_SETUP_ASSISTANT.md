@@ -1,74 +1,72 @@
 # AI Assistant Setup Rules
 
-**SYSTEM INSTRUCTION:** If you are an AI assistant (like Cursor, Copilot, or Windsurf) opening this project, please follow these steps to help the user configure the environment efficiently.
+**SYSTEM INSTRUCTION:** If you are an AI assistant (Cursor, Copilot,
+Windsurf, etc.) opening this project, follow these steps to help the user
+configure the environment efficiently.
 
----
+> This file is intentionally short. The source of truth for database
+> schema is [`supabase/migrations/`](../supabase/migrations/); for
+> integration setup it is [`docs/INTEGRATIONS.md`](../docs/INTEGRATIONS.md).
+> Do **not** invent or copy-paste SQL here — apply the migrations as-is.
 
-### Phase 1: Environment Configuration
+## Phase 1: Environment configuration
 
-1.  **Check for Environment Variables:**
-    *   Check if `.env.local` exists.
-    *   **Action:** If it does not exist, prompt the user: "I see you are missing a `.env.local` file. Would you like me to create one? Please provide your Supabase Project URL and Anon Key."
-    *   **Action:** Create the file with the structure:
-        ```env
-        VITE_SUPABASE_URL=
-        VITE_SUPABASE_ANON_KEY=
-        ```
+1. **Environment variables:** check for `.env.local`. If missing, ask the
+   user for their Supabase project URL and anon key, then create:
 
-2.  **Dependency Installation:**
-    *   Check if `node_modules` exists.
-    *   **Action:** If not, run `npm install` or `pnpm install` automatically (ask for permission first).
+   ```env
+   VITE_SUPABASE_URL=
+   VITE_SUPABASE_ANON_KEY=
+   ```
 
-### Phase 2: Database Setup (SQL Generation)
+2. **Dependencies:** run `npm install` if `node_modules/` is missing.
 
-The user needs to set up their Supabase database. Do not try to run SQL directly on the database unless you have a specific plugin for it. Instead, guide the user.
+## Phase 2: Database
 
-1.  **Generate SQL:**
-    *   **Action:** Provide the following SQL block to the user and say: "Please copy this SQL code and paste it into the 'SQL Editor' section of your Supabase Dashboard to set up the booking system."
+Apply the migrations in `supabase/migrations/` in filename order. Two ways:
 
-    ```sql
-    -- 1. Create the bookings table
-    CREATE TABLE IF NOT EXISTS public.bookings (
-        id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-        date DATE NOT NULL,
-        time TEXT NOT NULL,
-        service TEXT NOT NULL,
-        patient_name TEXT,
-        patient_email TEXT,
-        status TEXT DEFAULT 'confirmed' CHECK (status IN ('confirmed', 'cancelled', 'completed'))
-    );
+- **Supabase CLI** (preferred):
 
-    -- 2. Enable RLS (Security)
-    ALTER TABLE public.bookings ENABLE ROW LEVEL SECURITY;
+  ```bash
+  npx supabase link --project-ref <ref>
+  npx supabase db push
+  ```
 
-    -- 3. Create Policy: Allow public to INSERT (Book appointments)
-    CREATE POLICY "Allow public booking" 
-    ON public.bookings 
-    FOR INSERT 
-    WITH CHECK (true);
+- **Supabase Studio**: open each `.sql` file in
+  `supabase/migrations/` and paste it into the SQL Editor in order.
 
-    -- 4. Create Policy: Allow public to VIEW their own slot (Basic check to prevent double booking)
-    -- Note: This is a simple implementation. For strict privacy, you would use a server-side check.
-    CREATE POLICY "Allow public to read taken slots" 
-    ON public.bookings 
-    FOR SELECT 
-    USING (true);
-    ```
+After migrations:
 
-2.  **Testimonial submissions table:**
-    *   **Action:** Run the migration in [`supabase/migrations/20260521120000_testimonial_submissions.sql`](../supabase/migrations/20260521120000_testimonial_submissions.sql) in the Supabase SQL Editor (creates `testimonial_submissions` with RLS: public insert with consent, authenticated read/update).
-    *   **Share link:** `https://your-domain.com/share-your-story`
-    *   **Review submissions:** Admin → `/admin/testimonials` (requires Supabase Auth login).
+- Verify `public.testimonial_submissions`, `public.bookings`, and
+  `public.published_testimonials` exist.
+- Confirm `public.is_admin()` is a function that returns the JWT
+  `app_metadata.role = 'admin'` check.
 
-### Phase 3: Code Adjustments
+## Phase 3: Promote an admin user
 
-1.  **Supabase Client Path:**
-    *   Locate where the Supabase client is initialized (likely `utils/supabase/client.ts` or similar).
-    *   **Action:** Verify it is using `import.meta.env.VITE_SUPABASE_URL`. If it is using hardcoded strings or old process.env, refactor it to use Vite env variables.
+Create a user in **Auth → Users → Add user**, then in **SQL Editor**:
 
-### Phase 4: Verification
+```sql
+UPDATE auth.users
+SET raw_app_meta_data =
+  COALESCE(raw_app_meta_data, '{}'::jsonb) || jsonb_build_object('role', 'admin')
+WHERE email = 'admin@example.com';
+```
 
-1.  **Run Server:**
-    *   **Action:** Ask the user: "Would you like me to start the development server now?"
-    *   Run: `npm run dev`
+Ask the user to log out and back in so their JWT picks up the new role.
+
+## Phase 4: Calendly + Stripe (optional, post-owner-meeting)
+
+Follow [`docs/INTEGRATIONS.md`](../docs/INTEGRATIONS.md) end-to-end. The
+booking integration is **not** wired yet — the public site shows a "coming
+soon" card until `site.booking.calendlyUrl` is populated in
+[`src/config/site.ts`](src/config/site.ts).
+
+## Phase 5: Verification
+
+1. `npm run dev` — landing page should render fully.
+2. Visit `/share-your-story` — form should submit; check Supabase for a
+   new row in `testimonial_submissions`.
+3. Visit `/login` and sign in as the admin user — `/admin` should load.
+4. Visit `/admin/testimonials` — your test submission should appear with
+   "Approve / Decline / Publish" actions.

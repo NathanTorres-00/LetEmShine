@@ -19,10 +19,11 @@ export function Header() {
   }, []);
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    if (href === "#") {
+    if (href === "/") {
+      e.preventDefault();
       window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
+    } else if (href.startsWith("#")) {
+      e.preventDefault();
       const element = document.querySelector(href);
       if (element) {
         element.scrollIntoView({ behavior: "smooth" });
@@ -32,8 +33,8 @@ export function Header() {
   };
 
   const navLinks = [
-    { name: "Home", href: "#" },
-    { name: "Services", href: "#services" },
+    { name: "Home", href: "/" },
+    { name: "The Session", href: "#services" },
     { name: "Gallery", href: "#gallery" },
     { name: "Testimonials", href: "#testimonials" },
     { name: "Contact", href: "#contact" },
@@ -50,8 +51,8 @@ export function Header() {
     >
       <div className="container mx-auto h-full max-w-6xl px-6 flex items-center justify-between gap-6">
         <a
-          href="#"
-          onClick={(e) => handleNavClick(e, "#")}
+          href="/"
+          onClick={(e) => handleNavClick(e, "/")}
           className="flex shrink-0 items-center py-1 -ml-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 rounded-sm"
           aria-label="Shine by Lucy — Home"
         >

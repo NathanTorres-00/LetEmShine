@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { Loader2, CheckCircle2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -15,7 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { supabase } from "../utils/supabase/client";
+import {
+  supabase,
+  isSupabaseConfigured,
+} from "../utils/supabase/client";
 import type {
   NameDisplayPermission,
   PhotoPermission,
@@ -24,6 +27,7 @@ import type {
 import { ds } from "../design-system/classes";
 import { Logo } from "../components/Logo";
 import { siteHeaderHeight } from "../components/Header";
+import { site } from "../config/site";
 
 const initialForm: TestimonialSubmissionInsert = {
   full_name: "",
@@ -101,6 +105,7 @@ export function TestimonialFormPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
     if (!form.full_name.trim()) {
       toast.error("Please enter your name.");
@@ -114,9 +119,15 @@ export function TestimonialFormPage() {
       toast.error("Please confirm we may review and publish your feedback.");
       return;
     }
+    if (form.email && form.email.trim() && !isValidEmail(form.email.trim())) {
+      toast.error("Please enter a valid email or leave it blank.");
+      return;
+    }
 
-    if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-      toast.error("This form is not configured yet. Please contact Let Em Shine.");
+    if (!isSupabaseConfigured()) {
+      toast.error(
+        "This form isn't connected to the database yet. Please reach out by email.",
+      );
       return;
     }
 
@@ -147,18 +158,23 @@ export function TestimonialFormPage() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       console.error(err);
-      toast.error(
-        "We could not save your response. Please try again or email contact@letemshine.com.",
-      );
+      const fallbackMsg = site.contact.email
+        ? `We could not save your response. Please try again or email ${site.contact.email}.`
+        : "We could not save your response. Please try again in a moment.";
+      toast.error(fallbackMsg);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  function isValidEmail(value: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
+
   if (submitted) {
     return (
       <div className={ds.page}>
-        <div className={ds.decorGradientRight} />
+        <div className={ds.decorMutedPanel} />
         <div className="container mx-auto px-6 py-24 max-w-2xl relative z-10 text-center">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-neutral-50 text-neutral-900 mb-8">
             <CheckCircle2 className="w-10 h-10" />
@@ -184,7 +200,7 @@ export function TestimonialFormPage() {
 
   return (
     <div className={ds.page}>
-      <div className={ds.decorGradientRight} />
+      <div className={ds.decorMutedPanel} />
       <header
         className={`fixed top-0 left-0 right-0 z-50 border-b border-border-default bg-bg-default/90 backdrop-blur-md`}
         style={{ height: siteHeaderHeight }}
@@ -220,6 +236,35 @@ export function TestimonialFormPage() {
             sentence or two per question is perfect.
           </p>
         </div>
+
+        {!isSupabaseConfigured() && (
+          <div
+            role="alert"
+            className="mb-8 rounded-[var(--radius-lg)] border border-amber-200 bg-amber-50 p-4 flex gap-3"
+          >
+            <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-amber-900 leading-relaxed">
+              <p className="font-medium">This form is temporarily unavailable.</p>
+              <p className="mt-1 text-amber-800">
+                Our submission system isn&rsquo;t connected right now.{" "}
+                {site.contact.email ? (
+                  <>
+                    Please email{" "}
+                    <a
+                      href={`mailto:${site.contact.email}?subject=Sharing%20my%20Shine%20story`}
+                      className="underline font-medium"
+                    >
+                      {site.contact.email}
+                    </a>{" "}
+                    instead and we&rsquo;ll capture your story by hand.
+                  </>
+                ) : (
+                  <>Please check back shortly &mdash; we&rsquo;re fixing it now.</>
+                )}
+              </p>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-8">
           <SectionCard

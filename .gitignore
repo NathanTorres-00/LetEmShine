@@ -135,3 +135,7 @@ build
 
 # Vercel
 .vercel
+
+# Unrelated working-directory artifacts that shouldn't be part of this repo
+DiamondDetailing/
+SOP-Netlify-Client-Hosting.md

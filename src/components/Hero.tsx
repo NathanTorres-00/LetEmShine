@@ -3,6 +3,13 @@ import { Button } from "./ui/button";
 import { motion } from "motion/react";
 import { ds } from "../design-system/classes";
 import { siteHeaderHeight } from "./Header";
+import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { site } from "../config/site";
+
+// TODO replace with owner-supplied photography (Lucy) once available.
+// Recommended dimensions: 1200x1500 (4:5) or square; serve as WebP from /public.
+const HERO_IMAGE_SRC =
+  "https://images.unsplash.com/photo-1758600587815-b654d1405e83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxicmlnaHQlMjB3aGl0ZSUyMHNtaWxlJTIwd29tYW4lMjBjbG9zZSUyMHVwfGVufDF8fHx8MTc2MzY2OTU0N3ww&ixlib=rb-4.1.0&q=80&w=1080";
 
 export function Hero() {
   return (
@@ -18,7 +25,7 @@ export function Hero() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <p className={`${ds.labelCaps} mb-6`}>✦ Luxury beauty</p>
+          <p className={`${ds.labelCaps} mb-6`}>✦ Teeth whitening</p>
 
           <h1 className={`${ds.headingDisplay} mb-2`}>Let Your Smile</h1>
           <p
@@ -30,10 +37,7 @@ export function Hero() {
             by Lucy
           </p>
 
-          <p className={`${ds.textBodyLg} mb-8 max-w-md`}>
-            Bespoke teeth whitening in the heart of the city. Safe, effective, and tailored
-            just for you.
-          </p>
+          <p className={`${ds.textBodyLg} mb-8 max-w-md`}>{site.tagline}</p>
 
           <div className="flex flex-wrap gap-4">
             <Button
@@ -43,7 +47,7 @@ export function Hero() {
                 document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })
               }
             >
-              Book Now
+              Book Your Session
             </Button>
             <Button
               size="lg"
@@ -68,22 +72,15 @@ export function Hero() {
             className="relative aspect-[4/5] md:aspect-square overflow-hidden shadow-[var(--shadow-elevated)]"
             style={{ borderRadius: "var(--radius-xl)" }}
           >
-            <img
-              src="https://images.unsplash.com/photo-1758600587815-b654d1405e83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxicmlnaHQlMjB3aGl0ZSUyMHNtaWxlJTIwd29tYW4lMjBjbG9zZSUyMHVwfGVufDF8fHx8MTc2MzY2OTU0N3ww&ixlib=rb-4.1.0&q=80&w=1080"
-              alt="Woman with bright smile"
+            <ImageWithFallback
+              src={HERO_IMAGE_SRC}
+              alt="Bright, healthy smile"
               className="w-full h-full object-cover"
+              fetchPriority="high"
+              loading="eager"
+              decoding="async"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/20 to-transparent" />
-          </div>
-
-          <div className="absolute -bottom-6 -left-6 bg-bg-default p-4 rounded-[var(--radius-lg)] shadow-[var(--shadow-elevated)] flex items-center gap-4 max-w-xs border border-border-default">
-            <div className="h-12 w-12 bg-neutral-50 rounded-full flex items-center justify-center text-2xl">
-              ✨
-            </div>
-            <div>
-              <p className="font-sans font-medium text-text-primary">#1 Whitening</p>
-              <p className={ds.textBodySm}>Voted by Bright City</p>
-            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/20 to-transparent pointer-events-none" />
           </div>
         </motion.div>
       </div>
