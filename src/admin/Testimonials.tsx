@@ -15,8 +15,8 @@ import { ds } from "../design-system/classes";
 
 const STATUS_LABELS: Record<TestimonialStatus, string> = {
   pending: "Pending review",
-  approved: "Approved",
-  published: "Published",
+  approved: "Approved (not on site yet)",
+  published: "Published (live on site)",
   declined: "Declined",
 };
 

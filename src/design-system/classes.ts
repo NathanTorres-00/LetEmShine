@@ -62,4 +62,12 @@ export const ds = {
   sectionInverse: "bg-bg-inverse text-text-inverse",
   decorMutedPanel:
     "absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-neutral-50/80 to-transparent rounded-bl-[100px] pointer-events-none",
+
+  /** Glass nav over dark editorial hero (Figma 07 Glass / Patterns) */
+  glassNavDark:
+    "bg-[rgb(255_255_255/0.08)] backdrop-blur-md border-b border-[rgb(255_255_255/0.14)]",
+  editorialHero: "relative min-h-[720px] lg:min-h-[820px] bg-[#1b1b1d] text-text-inverse overflow-hidden",
+  editorialRule: "absolute top-0 bottom-0 left-[520px] w-px bg-white/12 hidden lg:block",
+  editorialSideLabel:
+    "absolute left-7 top-1/2 -translate-y-1/2 -rotate-90 origin-center font-sans text-[9px] uppercase tracking-[0.18em] text-neutral-600 whitespace-nowrap hidden lg:block",
 } as const;

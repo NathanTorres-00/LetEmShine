@@ -26,3 +26,6 @@ GRANT SELECT ON public.published_testimonials TO anon, authenticated;
 
 REVOKE SELECT ON public.testimonial_submissions FROM anon;
 REVOKE SELECT ON public.testimonial_submissions FROM authenticated;
+
+-- authenticated still needs table-level SELECT; RLS + is_admin() restricts rows.
+GRANT SELECT ON public.testimonial_submissions TO authenticated;

@@ -1,89 +1,109 @@
 import React from "react";
-import { Button } from "./ui/button";
 import { motion } from "motion/react";
+import { Button } from "./ui/button";
 import { ds } from "../design-system/classes";
-import { siteHeaderHeight } from "./Header";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { site } from "../config/site";
 
-// TODO replace with owner-supplied photography (Lucy) once available.
-// Recommended dimensions: 1200x1500 (4:5) or square; serve as WebP from /public.
-const HERO_IMAGE_SRC =
-  "https://images.unsplash.com/photo-1758600587815-b654d1405e83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxicmlnaHQlMjB3aGl0ZSUyMHNtaWxlJTIwd29tYW4lMjBjbG9zZSUyMHVwfGVufDF8fHx8MTc2MzY2OTU0N3ww&ixlib=rb-4.1.0&q=80&w=1080";
+const fadeUp = {
+  initial: { opacity: 0, y: 28 },
+  animate: { opacity: 1, y: 0 },
+};
 
 export function Hero() {
+  const { serviceCategory, serviceDescription } = site.pricing;
+
   return (
     <section
-      className="relative min-h-screen flex items-center overflow-hidden bg-bg-muted pb-12"
-      style={{ paddingTop: siteHeaderHeight + 24 }}
+      id="hero"
+      className={ds.editorialHero}
+      aria-label="Shine by Lucy — Teeth Whitening Session"
     >
-      <div className={ds.decorMutedPanel} />
+      <div className={ds.editorialRule} aria-hidden="true" />
 
-      <div className="container mx-auto px-6 relative z-10 grid md:grid-cols-2 gap-12 items-center">
-        <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
+      <p className={ds.editorialSideLabel} aria-hidden="true">
+        Shine by Lucy
+      </p>
+
+      <motion.p
+        {...fadeUp}
+        transition={{ duration: 0.7, delay: 0.05 }}
+        className={`absolute top-10 md:top-12 left-6 md:left-16 ${ds.labelCaps} text-[#66666e]`}
+      >
+        01 / {serviceCategory}
+      </motion.p>
+
+      <motion.p
+        {...fadeUp}
+        transition={{ duration: 0.9, delay: 0.1 }}
+        className={`${ds.displaySerif} absolute left-[-0.5rem] md:left-[-1.5rem] top-[7.5rem] md:top-[6.875rem] text-[clamp(7rem,18vw,12.5rem)] leading-[0.9] tracking-[-0.03em] text-white pointer-events-none select-none`}
+        aria-hidden="true"
+      >
+        Shine
+      </motion.p>
+
+      <motion.p
+        {...fadeUp}
+        transition={{ duration: 0.85, delay: 0.25 }}
+        className={`${ds.displayScript} absolute left-[12rem] md:left-[21.25rem] top-[16rem] md:top-[20.625rem] text-[clamp(2.75rem,6vw,4.5rem)] leading-none text-white/80 pointer-events-none`}
+        aria-hidden="true"
+      >
+        by Lucy
+      </motion.p>
+
+      <div className="absolute inset-x-0 top-[7rem] md:top-[11.25rem] lg:left-[600px] lg:right-auto lg:w-[340px] px-6 md:px-10 lg:px-0">
+        <motion.p
+          {...fadeUp}
+          transition={{ duration: 0.7, delay: 0.35 }}
+          className={`${ds.labelCaps} text-[#73737a] mb-3`}
         >
-          <p className={`${ds.labelCaps} mb-6`}>✦ Teeth whitening</p>
+          Teeth Whitening
+        </motion.p>
 
-          <h1 className={`${ds.headingDisplay} mb-2`}>Let Your Smile</h1>
-          <p
-            className={`${ds.displayScript} text-[64px] md:text-[80px] text-neutral-900 -mt-2 mb-1`}
-          >
-            Shine
-          </p>
-          <p className={`${ds.displaySerif} text-[32px] md:text-[40px] text-text-secondary mb-8`}>
-            by Lucy
-          </p>
+        <motion.h1
+          {...fadeUp}
+          transition={{ duration: 0.75, delay: 0.42 }}
+          className={`${ds.displaySerif} text-[clamp(2rem,4vw,3rem)] leading-[1.12] tracking-[-0.02em] text-white mb-6`}
+        >
+          Every moment
+          <br />
+          tells a story.
+        </motion.h1>
 
-          <p className={`${ds.textBodyLg} mb-8 max-w-md`}>{site.tagline}</p>
-
-          <div className="flex flex-wrap gap-4">
-            <Button
-              size="lg"
-              className={ds.btnPrimaryLg}
-              onClick={() =>
-                document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
-              Book Your Session
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className={ds.btnSecondaryLg}
-              onClick={() =>
-                document.getElementById("gallery")?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
-              View Results
-            </Button>
-          </div>
-        </motion.div>
+        <motion.p
+          {...fadeUp}
+          transition={{ duration: 0.7, delay: 0.5 }}
+          className="font-sans text-[15px] leading-6 text-[#8c8c94] mb-10 max-w-[340px]"
+        >
+          {serviceDescription}
+        </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="relative"
+          {...fadeUp}
+          transition={{ duration: 0.65, delay: 0.58 }}
         >
-          <div
-            className="relative aspect-[4/5] md:aspect-square overflow-hidden shadow-[var(--shadow-elevated)]"
-            style={{ borderRadius: "var(--radius-xl)" }}
+          <Button
+            size="lg"
+            className="h-12 px-7 rounded-full bg-white text-neutral-950 hover:bg-neutral-100 font-sans text-[13px] tracking-wide shadow-none"
+            onClick={() =>
+              document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })
+            }
           >
-            <ImageWithFallback
-              src={HERO_IMAGE_SRC}
-              alt="Bright, healthy smile"
-              className="w-full h-full object-cover"
-              fetchPriority="high"
-              loading="eager"
-              decoding="async"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/20 to-transparent pointer-events-none" />
-          </div>
+            Reserve Your Session
+          </Button>
         </motion.div>
       </div>
+
+      <motion.p
+        {...fadeUp}
+        transition={{ duration: 0.6, delay: 0.65 }}
+        className="absolute bottom-8 md:bottom-12 left-6 md:left-16 font-sans text-[10px] tracking-wide text-[#595961]"
+      >
+        Est. 2020 · San Francisco · By appointment only
+      </motion.p>
+
+      <span className="sr-only">
+        Shine by Lucy — {site.pricing.serviceName}. {site.tagline}
+      </span>
     </section>
   );
 }
